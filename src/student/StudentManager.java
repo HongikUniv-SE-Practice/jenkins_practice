@@ -27,5 +27,5 @@ public class StudentManager {
         return students.contains(name);
     }
     
-    // repo 생성 - C011069 문덕영
+    // 프로젝트 세팅 완료 - 문덕영
 }
