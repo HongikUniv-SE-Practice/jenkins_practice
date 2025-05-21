@@ -18,11 +18,13 @@ pipeline {
         stage('Prepare') {
             steps {
                 sh '''
-                    mkdir -p ${CLASS_DIR}
-                    mkdir -p ${REPORT_DIR}
+                    mkdir -p $CLASS_DIR
+                    mkdir -p $REPORT_DIR
                     mkdir -p lib
-                    echo "[+] Downloading JUnit JAR..."
-                    curl -L -o ${JUNIT_JAR_PATH} ${JUNIT_JAR_URL}
+                    echo "[+] Downloading JUnit JARs..."
+            		curl -L -o lib/junit-platform-console-standalone.jar https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.7.1/junit-platform-console-standalone-1.7.1.jar
+            		curl -L -o lib/junit-jupiter-api.jar https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-api/5.7.1/junit-jupiter-api-5.7.1.jar
+            		curl -L -o lib/apiguardian-api.jar https://repo1.maven.org/maven2/org/apiguardian/apiguardian-api/1.1.0/apiguardian-api-1.1.0.jar
                 '''
             }
         }
@@ -30,12 +32,9 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    echo "[+] Compiling source files..."
-                    pwd
-            		ls -al
-            		ls -al lib
+                    echo "[+] Compiling source files..."                    
                     find src -name "*.java" > sources.txt
-                    javac -encoding UTF-8 -d ../${CLASS_DIR} -cp ../${JUNIT_JAR_PATH} @sources.txt
+                    javac -encoding UTF-8 -d $CLASS_DIR -cp "lib/*" @sources.txt
                 '''
             }
         }
@@ -44,15 +43,15 @@ pipeline {
             steps {
                 sh '''
                     echo "[+] Running tests with JUnit..."
-                    java -jar ${JUNIT_JAR_PATH} \
-                         --class-path ${CLASS_DIR} \
+                    java -jar $JUNIT_JAR_PATH \
+                         --class-path $CLASS_DIR \
                          --scan-class-path \
                          --details=tree \
                          --details-theme=ascii \
-                         --reports-dir ${REPORT_DIR} \
+                         --reports-dir $REPORT_DIR \
                          --config=junit.platform.output.capture.stdout=true \
                          --config=junit.platform.reporting.open.xml.enabled=true \
-                         > ${REPORT_DIR}/test-output.txt
+                         > $REPORT_DIR/test-output.txt
                 '''
             }
         }
@@ -61,8 +60,8 @@ pipeline {
     post {
         always {
             echo "[*] Archiving test results..."
-            junit "${REPORT_DIR}/**/*.xml"
-            archiveArtifacts artifacts: "${REPORT_DIR}/**/*", allowEmptyArchive: true
+            junit "$REPORT_DIR/**/*.xml"
+            archiveArtifacts artifacts: "$REPORT_DIR/**/*", allowEmptyArchive: true
         }
 
         failure {
