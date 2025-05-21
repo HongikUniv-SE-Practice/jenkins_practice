@@ -67,18 +67,17 @@ pipeline {
         failure {
             echo "Build or test failed!"
         }
+        
+        // 빌드 성공 시 txt 파일 저장
+		success {
+        echo "Build and test succeeded!"
+        sh '''
+            echo "Build Success" > $REPORT_DIR/build-result.txt
+            echo "Job: $JOB_NAME" >> $REPORT_DIR/build-result.txt
+            echo "Build: #$BUILD_NUMBER" >> $REPORT_DIR/build-result.txt
+            echo "URL: $BUILD_URL" >> $REPORT_DIR/build-result.txt
+        '''
+	    }
 		
-		// 성공하면 이메일로 보내지도록 구성
-        success {
-        emailext(
-            subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: """Good news!
-
-Build ${env.BUILD_NUMBER} was successful.
-Check it at: ${env.BUILD_URL}
-""",
-            to: "mdy3722@gmail.com"
-        )
-    }
     }
 }
