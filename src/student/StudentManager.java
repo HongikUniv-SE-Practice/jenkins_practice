@@ -28,4 +28,5 @@ public class StudentManager {
     }
     
     // 프로젝트 세팅 완료 - 문덕영
+    // 커밋 테스트
 }
