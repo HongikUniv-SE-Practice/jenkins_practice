@@ -67,9 +67,12 @@ pipeline {
         failure {
             echo "Build or test failed!"
         }
-
+		
+		// 성공하면 이메일로 보내지도록 구성
         success {
-            echo "Build and test succeeded!"
+            subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: "Good news!\n\nBuild ${env.BUILD_NUMBER} was successful.\nCheck it at: ${env.BUILD_URL}",
+            to: "mdy3722@gmail.com"
         }
     }
 }
