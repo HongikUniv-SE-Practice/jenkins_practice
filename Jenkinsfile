@@ -71,7 +71,10 @@ pipeline {
 		// 성공하면 이메일로 보내지도록 구성
         success {
             subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: "Good news!\n\nBuild ${env.BUILD_NUMBER} was successful.\nCheck it at: ${env.BUILD_URL}",
+            body: """Good news!
+            
+            Build ${env.BUILD_NUMBER} was successful.
+            Check it at: ${env.BUILD_URL}""",
             to: "mdy3722@gmail.com"
         }
     }
